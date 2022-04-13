@@ -23,25 +23,26 @@ class PokerGame(object):
 	"""
 
 	current_game = None
+	id_query = ''
+	new_ids = []
 
 	def __init__(self, players, url):
 		"""
 		Creates a PokerGame object.
 
 		Parameter players: The players playing in this PokerGame.
-		Precondition: players is a non-empty list of discord.Member objects.
+		Precondition: players is a non-empty list of non-empty strings, each
+		of which represents a valid discord.Member object.
 
 		Parameter url: The PokerNow URL representing this PokerGame.
 		Precondition: url is a valid PokerNow URL.
 		"""
 
 		assert isinstance(url, str), "Parameter url must be a string."
-		player_ids = []
-		for player in players:
-			assert isinstance(player, discord.Member), "Parameter players is invalid."
-			player_ids.append(player.id)
+		for player_id in players:
+			assert isinstance(player_id, str), "Parameter players is invalid."
 
-		self.players = player_ids
+		self.players = players
 		self.url = url
 
 		current_game = self

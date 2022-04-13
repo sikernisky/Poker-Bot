@@ -159,6 +159,59 @@ def test_different_ids():
 	print('Passed Unit Test: test_different_ids()')
 
 
+def test_valid_url():
+	"""
+	Unit test for valid_url.
+	"""
+
+	#Test 1: url is an empty string.
+	url = ''
+	result = poker_scrape.valid_url(url)
+	assert result == False, 'failed: got ' + repr(result)
+
+	#Test 2: url is a string with one character.
+	url = '/'
+	result = poker_scrape.valid_url(url)
+	assert result == False, 'failed: got ' + repr(result)
+
+	#Test 3: url is just the PokerNow url stub (https://www.pokernow.club/games/)
+	url = 'https://www.pokernow.club/games/'
+	result = poker_scrape.valid_url(url)
+	assert result == False, 'failed: got ' + repr(result)
+
+	#Test 4: url is valid but has a missing slash in its stub
+	url = 'https:/www.pokernow.club/games/pglMvypJMlx4MgcBmnRRNMn0S'
+	result = poker_scrape.valid_url(url)
+	assert result == False, 'failed: got ' + repr(result)
+
+	#Test 5: url is valid but has a missing slash at the end of its stub
+	url = 'https:/www.pokernow.club/gamespglMvypJMlx4MgcBmnRRNMn0S'
+	result = poker_scrape.valid_url(url)
+	assert result == False, 'failed: got ' + repr(result)
+
+	#Test 6: url has a valid stub but invalid game ID
+	url = 'https:/www.pokernow.club/games/pglMvypJOQIjoemanchinEGHVIwe9Q023GJFVnjoebidenBmnRRNMn0S'
+	result = poker_scrape.valid_url(url)
+	assert result == False, 'failed: got ' + repr(result)
+
+	#Test 7: url is a string with more than one character.
+	url = 'hi'
+	result = poker_scrape.valid_url(url)
+	assert result == False, 'failed: got ' + repr(result)
+
+	#Test 8: url is a valid game ID.
+	url = 'https://www.pokernow.club/games/pglMvypJMlx4MgcBmnRRNMn0S'
+	result = poker_scrape.valid_url(url)
+	assert result == True, 'failed: got ' + repr(result)
+
+	#Test 9: url is a valid game ID with one character missing, making it invalid.
+	url = 'https://www.pokernow.club/games/pglMypJMlx4MgcBmnRRNMn0S'
+	result = poker_scrape.valid_url(url)
+	assert result == False, 'failed: got ' + repr(result)	
+
+	print('Passed Unit Test: test_valid_url()')
+
+
 def test_clean_ledger_data():
 	"""
 	Unit test for clean_ledger_data.
@@ -234,11 +287,57 @@ def test_clean_ledger_data():
 
 	print('Passed Unit Test: test_clean_ledger_data()')
 
+def test_compute_stats():
+	"""
+	Unit Test for compute_stats.
+	"""
+
+	#Test 1: Both prev_people and prev_stats are empty.
+	prev_stats = {}
+	prev_people = {}
+	result = poker_save.compute_stats(prev_stats, prev_people)
+	assert result == {}, "failed: got " + repr(result)
+
+	#Test 2: prev_people is not empty, prev_stats is.
+	prev_stats = {}
+	prev_people = {'slegr32mf2':'12598222251'}
+	result = poker_save.compute_stats(prev_stats, prev_people)
+	assert result == {'12598222251' : 0}, "failed: got " + repr(result)
+
+	#Test 3: prev_people and prev_stats have one element with the same PokerNow ID.
+	prev_stats = {'slegr32mf2':40000}
+	prev_people = {'slegr32mf2':'12598222251'}
+	result = poker_save.compute_stats(prev_stats, prev_people)
+	assert result == {'12598222251':40000}, "failed: got " + repr(result)
+
+	#Test 4: prev_people and prev_stats have two elements with the same PokerNow ID.
+	prev_stats = {'slegr32mf2':40000, 'mm73mcjklcvgk8':2000}
+	prev_people = {'slegr32mf2':'12598222251', 'mm73mcjklcvgk8':'9521313288'}
+	result = poker_save.compute_stats(prev_stats, prev_people)
+	assert result == {'12598222251':40000, '9521313288':2000}, "failed: got " + repr(result)
+
+	#Test 5: prev_people and prev_stats have two elements with different PokerNow IDs.
+	prev_stats = {'slegr32mf2':40000, 'mm73mcjklcvgk8':2000}
+	prev_people = {'slegr32mf2':'12598222251', 'mm73mcjklcvgk8':'9521313288', 'awoegia7aah':'1029512'}
+	result = poker_save.compute_stats(prev_stats, prev_people)
+	assert result == {'12598222251':40000, '9521313288':2000, '1029512':0}, "failed: got " + repr(result)
+
+	#Test 6: prev_people has two elements, prev_stats has one : same PokerNow ID.
+	prev_stats = {'slegr32mf2':40000,}
+	prev_people = {'slegr32mf2':'12598222251', 'mm73mcjklcvgk8':'9521313288'}
+	result = poker_save.compute_stats(prev_stats, prev_people)
+	assert result == {'12598222251':40000, '9521313288':0}, "failed: got " + repr(result)
+
+	#Test 7: prev_people has multiple occurances of the same Discord ID.
+
+	print('Passed Unit Test: test_compute_stats()')
 
 if __name__ == '__main__':
 	"""
 	Runs all unit tests.
 	"""
+	test_valid_url()
 	test_update_stats()
 	test_different_ids()
 	test_clean_ledger_data()
+	test_compute_stats()

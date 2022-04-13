@@ -15,10 +15,20 @@ import requests
 import time
 
 
-def update():
+
+def valid_url(url):
 	"""
+	Returns: True if `url`, when pasted into the browser, links to a valid
+	PokerNow game.
 	"""
-	scrape_ledger_data(url)
+	if (not isinstance(url, str)):
+		return False
+	if url.find('https://www.pokernow.club/games/') != 0:
+		return False
+
+	response = str((requests.get(url)).content)
+	return ('tos-agreement' not in response) and ('jitsi-container' in response)
+
 
 
 def scrape_ledger_data(url):
@@ -28,15 +38,14 @@ def scrape_ledger_data(url):
 	Parameter `url`: The PokerNow URL to scrape from.
 	Precondition: `url` is a string and a valid PokerNow URL.
 	"""
-	assert isinstance(url, str), 'Parameter url must be a string.'
-	assert 'https://www.pokernow.club/games/' in url, 'Parameter url must be a valid PokerNow URL.'
+	assert valid_url(url), "Parameter url is not a valid PokerNow URL."
 
 	driver = webdriver.Chrome()
 	driver.get(url)
 	wait = WebDriverWait(driver, 20)
 	stats_button = driver.find_element(By.XPATH, '//*[@id="canvas"]/div[1]/button')
 	driver.execute_script("arguments[0].click();", stats_button)
-	time.sleep(1)
+	time.sleep(.5)
 	ledger_button = driver.find_element(By.XPATH, 
 		'//*[@id="canvas"]/div[1]/div[2]/div/div[2]/div[2]/button[2]')
 	driver.execute_script("arguments[0].click();", ledger_button)
