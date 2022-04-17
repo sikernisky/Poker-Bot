@@ -147,23 +147,4 @@ async def assign(ctx, *, member : discord.Member = None):
 		# print(response.content)
 
 
-# if __name__ == '__main__':
-# 	# """
-# 	# """
-# 	# url = 'https://www.pokernow.club/games/pglfGWYiDhD618K4dly9jFOh_'
-
-# 	# #THIS IS TO GO IN "TRACK"
-
-# 	# #1. Scrape data.
-# 	# scraped_data = poker_scrape.scrape_ledger_data(url)
-	
-# 	# #2. Update everyone's net balances.
-# 	# poker_save.update_all_balances(scraped_data)
-
-# 	# #3. Get new/foreign PokerNow IDs in the updated NET file.
-# 	# new_ids = poker_save.get_foreign_ids()
-
-# 	# #4. Poll users to match new Poker IDs to Discord IDs.
-# 	# pass
-
 client.run(os.getenv('TOKEN'))
