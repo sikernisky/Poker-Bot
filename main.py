@@ -10,7 +10,6 @@ from dotenv import load_dotenv #Delete once on Heroku
 from discord.ext import tasks
 
 
-load_dotenv() #Delete once on Heroku
 intents = discord.Intents.default()
 intents.members = True
 client = commands.Bot(intents = intents, command_prefix='!')
@@ -22,7 +21,6 @@ async def on_ready():
 	Performs logic when the bot is 'Ready'.
 	"""
 	print('Poker Bot Ready!')
-	#refresh.start()
 
 
 @client.command()
