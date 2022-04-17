@@ -18,6 +18,8 @@ gChromeOptions = webdriver.ChromeOptions()
 gChromeOptions.add_argument("disable-dev-shm-usage")
 gChromeOptions.add_argument("--disable-dev-shm-usage")
 gChromeOptions.add_argument("--no-sandbox")
+gChromeOptions.add_argument("window-size=1400,745")
+
 
 
 def valid_url(url):
@@ -45,10 +47,10 @@ def scrape_ledger_data(url):
 	assert valid_url(url), "Parameter url is not a valid PokerNow URL."
 
 	#driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
-	driver = webdriver.Chrome(chrome_options=gChromeOptions, executable_path=ChromeDriverManager().install())
+	driver = webdriver.Chrome(options=gChromeOptions, executable_path=ChromeDriverManager().install())
 	driver.get(url)
 	wait = WebDriverWait(driver, 20)
-	stats_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="canvas"]/div[1]/button')))
+	stats_button = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="canvas"]/div[1]/button')))
 	driver.execute_script("arguments[0].click();", stats_button)
 	ledger_button = wait.until(EC.element_to_be_clickable((By.XPATH,'//*[@id="canvas"]/div[1]/div[2]/div/div[2]/div[2]/button[2]')))
 	driver.execute_script("arguments[0].click();", ledger_button)
