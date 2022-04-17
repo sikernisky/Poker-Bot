@@ -10,13 +10,13 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 import requests
 import time
 
-chrome_options = Options()
-chrome_options.binary_location = GOOGLE_CHROME_BIN
-chrome_options.add_argument('--disable-gpu')
-chrome_options.add_argument('--no-sandbox')
+gChromeOptions = webdriver.ChromeOptions()
+gChromeOptions.add_argument("window-size=1920x1480")
+gChromeOptions.add_argument("disable-dev-shm-usage")
 
 def valid_url(url):
 	"""
@@ -42,7 +42,8 @@ def scrape_ledger_data(url):
 	"""
 	assert valid_url(url), "Parameter url is not a valid PokerNow URL."
 
-	driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
+	#driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
+	driver = webdriver.Chrome(chrome_options=gChromeOptions, executable_path=ChromeDriverManager().install())
 	driver.get(url)
 	wait = WebDriverWait(driver, 20)
 	stats_button = driver.find_element(By.XPATH, '//*[@id="canvas"]/div[1]/button')
