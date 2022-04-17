@@ -1,9 +1,0 @@
-discord.py
-flask
-python-dotenv
-PyNaCl
-dnspython
-bs4
-selenium
-requests
-time
