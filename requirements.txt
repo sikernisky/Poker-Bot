@@ -5,3 +5,4 @@ PyNaCl
 dnspython
 selenium
 requests
+webdriver_manager
