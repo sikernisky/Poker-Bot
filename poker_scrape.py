@@ -15,7 +15,7 @@ import requests
 import time
 
 gChromeOptions = webdriver.ChromeOptions()
-gChromeOptions.add_argument("window-size=1920x1480")
+gChromeOptions.add_argument("window-size=1350x745")
 gChromeOptions.add_argument("disable-dev-shm-usage")
 gChromeOptions.add_argument("--disable-dev-shm-usage")
 gChromeOptions.add_argument("--no-sandbox")
