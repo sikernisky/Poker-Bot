@@ -8,7 +8,7 @@ Complete test suite for the PokerBot.
 
 import poker_scrape
 import poker_save
-
+import game
 
 def test_update_stats():
 	"""
@@ -289,48 +289,228 @@ def test_clean_ledger_data():
 
 def test_compute_stats():
 	"""
-	Unit Test for compute_stats.
+	Unit test for compute_stats.
 	"""
 
-	#Test 1: Both prev_people and prev_stats are empty.
+	#Test 1: prev_stats and prev_people are empty.
 	prev_stats = {}
 	prev_people = {}
 	result = poker_save.compute_stats(prev_stats, prev_people)
 	assert result == {}, "failed: got " + repr(result)
 
-	#Test 2: prev_people is not empty, prev_stats is.
+	#Test 2: prev_stats is empty, prev_people is not.
 	prev_stats = {}
-	prev_people = {'slegr32mf2':'12598222251'}
+	prev_people = {'jj31nnaln3qm':'1235912213'}
 	result = poker_save.compute_stats(prev_stats, prev_people)
-	assert result == {'12598222251' : 0}, "failed: got " + repr(result)
+	assert result == {'1235912213' : 0}, "failed: got " + repr(result)
 
-	#Test 3: prev_people and prev_stats have one element with the same PokerNow ID.
-	prev_stats = {'slegr32mf2':40000}
-	prev_people = {'slegr32mf2':'12598222251'}
+	#Test 3: prev_stats and prev_people have the same PokerNow ID.
+	prev_stats = {'jj31nnaln3qm': 50000}
+	prev_people = {'jj31nnaln3qm':'1235912213'}
 	result = poker_save.compute_stats(prev_stats, prev_people)
-	assert result == {'12598222251':40000}, "failed: got " + repr(result)
+	assert result == {'1235912213' : 50000}, "failed: got " + repr(result)
 
-	#Test 4: prev_people and prev_stats have two elements with the same PokerNow ID.
-	prev_stats = {'slegr32mf2':40000, 'mm73mcjklcvgk8':2000}
-	prev_people = {'slegr32mf2':'12598222251', 'mm73mcjklcvgk8':'9521313288'}
+	#Test 4: prev_people has two PokerNow IDs that correspond to the same person.
+	#		 prev_stats only lists one of those IDs.
+	prev_stats = {'jj31nnaln3qm': 50000}
+	prev_people = {'jj31nnaln3qm':'1235912213', 'iowlxz2oiwj1':'1235912213' }
 	result = poker_save.compute_stats(prev_stats, prev_people)
-	assert result == {'12598222251':40000, '9521313288':2000}, "failed: got " + repr(result)
+	assert result == {'1235912213' : 50000}, "failed: got " + repr(result)
 
-	#Test 5: prev_people and prev_stats have two elements with different PokerNow IDs.
-	prev_stats = {'slegr32mf2':40000, 'mm73mcjklcvgk8':2000}
-	prev_people = {'slegr32mf2':'12598222251', 'mm73mcjklcvgk8':'9521313288', 'awoegia7aah':'1029512'}
+	#Test 5: prev_people has two PokerNow IDs that correspond to the same person.
+	#		 prev_stats lists both of those IDs.
+	prev_stats = {'jj31nnaln3qm': 50000, 'iowlxz2oiwj1' : 70000}
+	prev_people = {'jj31nnaln3qm':'1235912213', 'iowlxz2oiwj1':'1235912213' }
 	result = poker_save.compute_stats(prev_stats, prev_people)
-	assert result == {'12598222251':40000, '9521313288':2000, '1029512':0}, "failed: got " + repr(result)
+	assert result == {'1235912213' : 120000}, "failed: got " + repr(result)
 
-	#Test 6: prev_people has two elements, prev_stats has one : same PokerNow ID.
-	prev_stats = {'slegr32mf2':40000,}
-	prev_people = {'slegr32mf2':'12598222251', 'mm73mcjklcvgk8':'9521313288'}
+	#Test 6: repeat of above test but with negative net balances.
+	prev_stats = {'jj31nnaln3qm': -50000, 'iowlxz2oiwj1' : -70000}
+	prev_people = {'jj31nnaln3qm':'1235912213', 'iowlxz2oiwj1':'1235912213' }
 	result = poker_save.compute_stats(prev_stats, prev_people)
-	assert result == {'12598222251':40000, '9521313288':0}, "failed: got " + repr(result)
+	assert result == {'1235912213' : -120000}, "failed: got " + repr(result)
 
-	#Test 7: prev_people has multiple occurances of the same Discord ID.
+	#Test 7: repeat of above test but with one positive and one negative net balance.
+	prev_stats = {'jj31nnaln3qm': -50000, 'iowlxz2oiwj1' : 70000}
+	prev_people = {'jj31nnaln3qm':'1235912213', 'iowlxz2oiwj1':'1235912213' }
+	result = poker_save.compute_stats(prev_stats, prev_people)
+	assert result == {'1235912213' : 20000}, "failed: got " + repr(result)
+
+	#Test 8: prev_stats and prev_people have two different PokerNow IDs and Discord IDs.
+	prev_stats = {'jj31nnaln3qm': 50000, 'iowlxz2oiwj1' : 70000}
+	prev_people = {'jj31nnaln3qm':'1235912213', 'iowlxz2oiwj1':'9990410851' }
+	result = poker_save.compute_stats(prev_stats, prev_people)
+	assert result == {'1235912213' : 50000, '9990410851':70000}, "failed: got " + repr(result)
+
+	#Test 9: prev_people has two PokerNow IDs that correspond to the same person and
+	#		 one other PokerNow ID.
+	prev_stats = {'jj31nnaln3qm': 50000}
+	prev_people = {'jj31nnaln3qm':'1235912213', 'iowlxz2oiwj1':'9990410851' }
+	result = poker_save.compute_stats(prev_stats, prev_people)
+	assert result == {'1235912213' : 50000, '9990410851':0}, "failed: got " + repr(result)
+
+	#Test 10: prev_people has two PokerNow IDs that correspond to one person and two
+	#		 PokerNow IDs that correspond to another person.
+	prev_stats = {'jj31nnaln3qm': 50000, 'iowlxz2oiwj1' : 0, 'jq13tjgm1q1' : 90500 }
+	prev_people = {'jj31nnaln3qm':'1235912213', 'iowlxz2oiwj1':'9990410851', 'jq13tjgm1q1':'9990410851'}
+	result = poker_save.compute_stats(prev_stats, prev_people)
+	assert result == {'1235912213' : 50000, '9990410851':90500}, "failed: got " + repr(result)
+
+	#Test 11: prev_stats isn't empty, prev_people is.
+	prev_stats = {'jj31nnaln3qm': 50000, 'iowlxz2oiwj1' : 0, 'jq13tjgm1q1' : 90500 }
+	prev_people = {}
+	result = poker_save.compute_stats(prev_stats, prev_people)
+	assert result == {}, "failed: got " + repr(result)
+
+	#Test 12: prev_stats and prev_people have one element : different PokerNow ID.
+	prev_stats = {'jj31nnaln3qm': 50000}
+	prev_people = {'iowlxz2oiwj1':'9990410851' }
+	result = poker_save.compute_stats(prev_stats, prev_people)
+	assert result == {'9990410851': 0}, "failed: got " + repr(result)
+
+	#Test 13: prev_stats and prev_people have two elements with different PokerNow IDs.
+	prev_stats = {'jj31nnaln3qm': 50000, 'iowlxz2oiwj1' : 0}
+	prev_people = {'jq13tjgm1q1':'1235912213', 'awe9gh123d':'1250775'}
+	result = poker_save.compute_stats(prev_stats, prev_people)
+	assert result == {'1235912213':0, '1250775':0}, "failed: got " + repr(result)
+
+	#Test 14: prev_stats has one more & different element than prev_people, which has two elements.
+	prev_stats = {'jj31nnaln3qm': 50000, 'iowlxz2oiwj1' : 0, 'jq13tjgm1q1' : 90500 }
+	prev_people = {'jj31nnaln3qm':'1235912213', 'iowlxz2oiwj1':'9990410851'}
+	result = poker_save.compute_stats(prev_stats, prev_people)
+	assert result == {'1235912213' : 50000, '9990410851':0}, "failed: got " + repr(result)
 
 	print('Passed Unit Test: test_compute_stats()')
+
+def test_sort_stats():
+	"""
+	Unit test for sort_stats.
+	"""
+
+	#Test 1: empty dictionary
+	stats = {}
+	result = game.sort_stats(stats)
+	assert result == {}, "failed: got " + repr(result)
+
+	#Test 2: one element in dictionary
+	stats = {'198762987632':2000}
+	result = game.sort_stats(stats)
+	assert result == {'198762987632':2000}, "failed: got " + repr(result)
+
+	#Test 3: two elements, already sorted
+	stats = {'79120777732':50000, '198762987632':2000}
+	result = game.sort_stats(stats)
+	assert result == {'79120777732':50000, '198762987632':2000}, "failed: got " + repr(result)
+
+	#Test 4: two elements, not sorted
+	stats = {'198762987632':2000, '79120777732':50000}
+	result = game.sort_stats(stats)
+	assert result == {'79120777732':50000, '198762987632':2000}, "failed: got " + repr(result)
+
+	#Test 5: two elements, same net value
+	stats = {'198762987632':2000, '79120777732':2000}
+	result = game.sort_stats(stats)
+	assert result == {'198762987632':2000, '79120777732':2000}, "failed: got " + repr(result)
+
+	#Test 6: three elements, all wrong order
+	stats = {'198762987632':2000, '79120777732':20000, '61526681463':107050}
+	result = game.sort_stats(stats)
+	assert result == {'61526681463':107050, '79120777732':20000, '198762987632':2000}, "failed: got " + repr(result)
+
+	#Test 7: three elements, first is correct, others are not
+	stats = {'61526681463':107050, '198762987632':2000, '79120777732':20000, }
+	result = game.sort_stats(stats)
+	assert result == {'61526681463':107050, '79120777732':20000, '198762987632':2000}, "failed: got " + repr(result)
+
+	#Test 8: three elements, second is correct, others are not
+	stats = {'198762987632':2000, '79120777732':20000, '61526681463':107050, }
+	result = game.sort_stats(stats)
+	assert result == {'61526681463':107050, '79120777732':20000, '198762987632':2000}, "failed: got " + repr(result)
+
+	#Test 9: three elements, last is correct, others are not
+	stats = {'79120777732':20000, '61526681463':107050, '198762987632':2000,}
+	result = game.sort_stats(stats)
+	assert result == {'61526681463':107050, '79120777732':20000, '198762987632':2000}, "failed: got " + repr(result)
+
+	#Test 10: sorting wrongly-ordered negative numbers with positive numbers
+	stats = {'79120777732':-50000, '198762987632':2000}
+	result = game.sort_stats(stats)
+	assert result == {'198762987632':2000,'79120777732':-50000}, "failed: got " + repr(result)
+
+	#Test 11: sorting wrongly-ordered negative numbers alone
+	stats = {'79120777732':-50000, '198762987632':-30000}
+	result = game.sort_stats(stats)
+	assert result == {'198762987632':-30000,'79120777732':-50000}, "failed: got " + repr(result)
+
+	print('Passed Unit Test: test_sort_stats')
+
+def test_merge_stats():
+	"""
+	Unit test for merge_stats.
+	"""
+
+	#Test 1: two empty dictionaries
+	s1 = {}
+	s2 = {}
+	result = poker_save.merge_stats(s1, s2)
+	assert result == {}, "failed, got: " + repr(result)
+
+	#Test 2: one empty dictionary, one non-empty
+	s1 = {}
+	s2 = {'eee3h1tnf2f' : 30000}
+	result = poker_save.merge_stats(s1, s2)
+	assert result == {'eee3h1tnf2f' : 30000}, "failed, got: " + repr(result)
+
+	#Test 3: both dictionaries one element, same key
+	s1 = {'eee3h1tnf2f' : 50000}
+	s2 = {'eee3h1tnf2f' : 30000}
+	result = poker_save.merge_stats(s1, s2)
+	assert result == {'eee3h1tnf2f' : 80000}, "failed, got: " + repr(result)
+
+	#Test 4: both dictionaries one element, different key
+	s1 = {'eee3h1tnf2f' : 50000}
+	s2 = {'iqfhnq277tm' : 10000}
+	result = poker_save.merge_stats(s1, s2)
+	assert result == {'eee3h1tnf2f' : 50000, 'iqfhnq277tm' : 10000}, "failed, got: " + repr(result)
+
+	#Test 5: both dictionaries two elements, different keys
+	s1 = {'eee3h1tnf2f' : 50000, 'gn3ahqp252' : 0}
+	s2 = {'iqfhnq277tm' : 10000, 'cw3amnyk9' : 9000}
+	result = poker_save.merge_stats(s1, s2)
+	assert result == {'eee3h1tnf2f' : 50000, 'iqfhnq277tm' : 10000, 'gn3ahqp252':0,'cw3amnyk9':9000 }, "failed, got: " + repr(result)
+
+	#Test 6: both dictionaries two elements, one same key
+	s1 = {'eee3h1tnf2f' : 50000, 'gn3ahqp252' : 0}
+	s2 = {'eee3h1tnf2f' : 10000, 'cw3amnyk9' : 9000}
+	result = poker_save.merge_stats(s1, s2)
+	assert result == {'eee3h1tnf2f' : 60000, 'gn3ahqp252':0,'cw3amnyk9':9000 },"failed, got: " + repr(result)
+
+	#Test 7: both dictionaries two elements, both same keys
+	s1 = {'eee3h1tnf2f' : 50000, 'gn3ahqp252' : 0}
+	s2 = {'eee3h1tnf2f' : 10000, 'gn3ahqp252' : 9000}
+	result = poker_save.merge_stats(s1, s2)
+	assert result == {'eee3h1tnf2f' : 60000, 'gn3ahqp252':9000}, "failed, got: " + repr(result)
+
+	#Test 8: both dictionaries two elements, same keys and values
+	s1 = {'eee3h1tnf2f' : 10000, 'gn3ahqp252' : 0}
+	s2 = {'eee3h1tnf2f' : 10000, 'gn3ahqp252' : 0}
+	result = poker_save.merge_stats(s1, s2)
+	assert result == {'eee3h1tnf2f' : 20000, 'gn3ahqp252':0}, "failed, got: " + repr(result)
+
+	#Test 9: both dictionaries two elements, negative values
+	s1 = {'cw3amnyk9' : -10000, 'gn3ahqp252' : -100}
+	s2 = {'eee3h1tnf2f' : -10000, 'gn3ahqp252' : -9000}
+	result = poker_save.merge_stats(s1, s2)
+	assert result == {'cw3amnyk9' : -10000, 'eee3h1tnf2f' : -10000, 'gn3ahqp252':-9100}, "failed, got: " + repr(result)
+
+	#Test 10: both dictionaries two elements, one neg and one pos value
+	s1 = {'cw3amnyk9' : -10000, 'gn3ahqp252' : 0}
+	s2 = {'eee3h1tnf2f' : 10000, 'gn3ahqp252' : -9000}
+	result = poker_save.merge_stats(s1, s2)
+	assert result == {'cw3amnyk9' : -10000, 'eee3h1tnf2f' : 10000, 'gn3ahqp252':-9000}, "failed, got: " + repr(result)
+
+	print('Passed Unit Test: test_merge_stats')
+
 
 if __name__ == '__main__':
 	"""
@@ -341,3 +521,5 @@ if __name__ == '__main__':
 	test_different_ids()
 	test_clean_ledger_data()
 	test_compute_stats()
+	test_sort_stats()
+	test_merge_stats()

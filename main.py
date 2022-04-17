@@ -5,8 +5,9 @@ import poker_save
 import os
 import discord
 from discord.ext import commands
-from game import PokerGame
+import game
 from dotenv import load_dotenv #Delete once on Heroku
+from discord.ext import tasks
 
 
 load_dotenv() #Delete once on Heroku
@@ -21,6 +22,7 @@ async def on_ready():
 	Performs logic when the bot is 'Ready'.
 	"""
 	print('Poker Bot Ready!')
+	#refresh.start()
 
 
 @client.command()
@@ -28,7 +30,7 @@ async def test(ctx):
 	"""
 	
 	"""
-	PokerGame.new_ids = ['biden', 'manchin']
+	game.PokerGame.new_ids = ['biden', 'manchin']
 	await poll_members(ctx)
 
 
@@ -36,7 +38,17 @@ async def test(ctx):
 async def stats(ctx):
 	"""
 	"""
-	await ctx.send(poker_save.stats())
+	if game.PokerGame.current_game == None:
+		await game.print_poker_stats(ctx, client, poker_save.stats())
+	elif game.PokerGame.new_ids != []:
+		await ctx.send("Please assign players so that my stats are accurate.")
+	else:
+		await ctx.send("Please give me a moment while I scrape live PokerNow data. . .")
+		nets = await game.PokerGame.current_game.live_nets()
+		print(type(nets))
+		computed = poker_save.compute_stats(nets, poker_save.previous_people())
+		await game.print_poker_stats(ctx, client, computed)
+
 
 
 @client.command()
@@ -45,6 +57,15 @@ async def wipe(ctx):
 	"""
 	poker_save.wipe_files()
 	await ctx.send("Wiped files.")
+
+
+# @tasks.loop(seconds=25)
+# async def refresh():
+# 	if game.PokerGame.current_game != None and game.PokerGame.update_ctx != None:
+# 		scraped_data = poker_scrape.scrape_ledger_data(game.PokerGame.current_game.url)
+# 		poker_save.update_all_balances(scraped_data)
+# 		game.PokerGame.new_ids = poker_save.foreign_poker_ids()
+# 		await poll_members(game.PokerGame.update_ctx)
 
 
 
@@ -63,17 +84,23 @@ async def track(ctx, *, url):
 		return
 	await ctx.send("Tracking URL: **" + url + "**.")
 
+	if game.PokerGame.current_game != None:
+		await game.PokerGame.current_game.immortalize()
+		game.PokerGame.current_game = None
+
 	player_discord_ids = []
 	prev_players = poker_save.previous_people()
 	for k in prev_players:
 		player_discord_ids.append(prev_players[k])
 
-	tracked_game = PokerGame(player_discord_ids, url)
+	tracked_game = game.PokerGame(player_discord_ids, url)
+	game.PokerGame.update_ctx = ctx
 
-	scraped_data = poker_scrape.scrape_ledger_data(url)
-	poker_save.update_all_balances(scraped_data)
-	PokerGame.new_ids = poker_save.foreign_poker_ids()
-	await poll_members(ctx)
+	await tracked_game.live_nets()
+
+	#If there is a game already being tracked, write the Nets.
+
+
 
 # 	# #1. Scrape data.
 # 	# scraped_data = poker_scrape.scrape_ledger_data(url)
@@ -94,46 +121,20 @@ async def assign(ctx, *, member : discord.Member = None):
 	Assigns `id_query` to `member`. 
 	"""
 
-	if PokerGame.id_query == '': #Someone types !assign but PokerBot isn't polling
+	if game.PokerGame.id_query == '': #Someone types !assign but PokerBot isn't polling
 		await ctx.send("I am not currently matching PokerNow IDs with Discord members.")
 		return
 
 	if member == None:
 		await ctx.send("That member does not exist in this server. Please try again.")
 
-	poker_save.add_player(PokerGame.id_query, str(member.id))
+	poker_save.add_player(game.PokerGame.id_query, str(member.id))
 
-	await ctx.send("I assigned the PokerNow ID: **" + PokerGame.id_query + "** to " + member.name  + ".")
-	PokerGame.id_query = ''
-	await poll_members(ctx)
+	await ctx.send("I assigned the PokerNow ID: **" + game.PokerGame.id_query + "** to " + member.name  + ".")
+	game.PokerGame.id_query = ''
+	await game.PokerGame.current_game.poll_members(ctx)
 
 
-
-async def poll_members(ctx):
-	"""
-	For every PokerNow ID in PokerGame.`new_ids`, polls for a Discord ID.
-
-	For example, if new_ids = ['a','b','c'], then PokerBot asks:
-		"New PokerNow ID found: who is 'a'? Type !assign [discord_name] if it's you."
-		...
-		"New PokerNow ID found: who is 'b'? Type !assign [discord_name] if it's you."
-		...
-		"New PokerNow ID found: who is 'c'? Type !assign [discord_name] if it's you."
-
-	A !assign is only valid if the [discord_name.id] matches the [author.id].
-	"""
-	if PokerGame.new_ids == []:
-		return
-
-	poker_id = PokerGame.new_ids[0]
-	if len(PokerGame.new_ids) == 1:
-		PokerGame.new_ids = []
-	else:
-		PokerGame.new_ids = PokerGame.new_ids[1:]
-
-	await ctx.send("New PokerNow ID found: **" + poker_id + "**. Type !assign [person].")
-	PokerGame.id_query = poker_id
-		
 
 		# def check(m):
 		# 	"""

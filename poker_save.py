@@ -97,34 +97,48 @@ def stats():
 
 def compute_stats(prev_stats, prev_people):
 	"""
-	Returns: a dictionary of Discord IDs and their total net gain/loss.
+	Returns: A dictionary of Discord IDs and their accumulated net gains/losses.
 
-	Parameter prev_stats: The dictionary of PokerNow IDs and their net balances.
-	Precondition: prev_stats is a dictionary with:
-		-key [string]: valid PokerNowID
-		-value [int]: updated net loss/gain
+	Parameter prev_stats: All previous PokerNow IDs and their accumulated net gains/losses.
+	Precondition: prev_stats is a dictionary:
+		- key [str] : PokerNow ID
+		- value [int] : accumulated net gain/loss
 
-	Parameter prev_people: The dictionary of PokerNow IDs and their Discord IDs.
-	Precondition: prev_people is a dictionary with:
-		-key [string]: valid PokerNow ID
-		-value [string]: valid Discord ID
-
-	Precondition: every PokerNow ID in `prev_stats` must be a key in `prev_people`.
-
-	The returned dictionary has:
-		-key [string]: valid PokerNow ID
-		-value [int]: accumulated, saved net balance
+	Parameter prev_people: All previous PokerNow IDs and their corresponding Discord IDs.
+	Precondition: prev_people is a dictionary:
+		- key [str] : PokerNow ID
+		- value [str] : Discord ID
 	"""
+	assert isinstance(prev_stats, dict), 'parameter prev_stats must be a dict.'
+	assert isinstance(prev_people, dict), 'parameter prev_people must be a dict.'
 	for k in prev_stats:
-		assert k in prev_people, "Every key in prev_stats must be in prev_people."
+		assert isinstance(k, str), 'prev_stats must have string keys.'
+		assert len(k) > 0, 'a valid PokerId must be length > 0.'
+		assert isinstance(prev_stats[k], int), 'prev_stats must have int values.'
+	for k in prev_people:
+		assert isinstance(k, str), 'prev_people must have string keys.'
+		assert len(k) > 0, 'a valid PokerId must be length > 0.'
+		assert isinstance(prev_people[k], str), 'prev_people must have string keys.'
+		assert len(prev_people[k]) > 0, 'a valid Discord ID must be length > 0.'
+		for n in prev_people[k]:
+			assert not n.isalpha(), 'valid discord ids only contain integers.'
 
 	result = {}
 
-	for k in prev_people:
-		if k not in prev_stats:
-			result[prev_people[k]] = 0
-		else:
-			result[prev_people[k]] = prev_stats[k]
+	known_prev_stats = {}
+	for k in prev_stats:
+		if k in prev_people:
+			known_prev_stats[k] = prev_stats[k]
+
+	prev_stats = known_prev_stats
+
+	for poker_id in prev_people:
+		discord_id = prev_people[poker_id]
+		result[discord_id] = 0
+
+	for poker_id in prev_stats:
+		corresponding_discord = prev_people[poker_id]
+		result[corresponding_discord] += prev_stats[poker_id]
 
 	return result
 
@@ -209,41 +223,30 @@ def file_exists(file):
 		return False
 
 
-def update_all_balances(scraped_data):
+def merge_stats(s1, s2):
 	"""
-	Updates everyone's net balances and rewrites NET_FILE_NAME to reflect these
-	new balances.
+	Returns: a dictionary with all key, value pairs of s1 and s2.
+	If s1 and s2 share a key, their values are added together.
 
-	Parameter scraped_data: The newest data from PokerNow.com.
-	Precondition: scraped_data is a dictionary with:
-		-key [string]: valid PokerNowID
-		-value [int]: updated net loss/gain
+	The dictionary is:
+		- key [str] : valid PokerNow ID
+		- value [int] : accumulated net balance
 	"""
-	if not file_exists(NET_FILE_NAME): #This should only be called ONCE EVER, if at all
-		with open (NET_FILE_NAME, 'x') as f:
-			f.write(json.dumps(scraped_data))
-			f.close()
-	if not file_exists(ID_FILE_NAME): #This should only be called ONCE EVER, if at all
-		with open (ID_FILE_NAME, 'x') as f:
-			f.write(json.dumps({}))
-			f.close()
+	result = {}
+	for k in s1:
+		if k in result:
+			result[k] += s1[k]
+		else:
+			result[k] = s1[k]
 
+	for k in s2:
+		if k in result:
+			result[k] += s2[k]
+		else:
+			result[k] = s2[k]
 
-	prev_stats = previous_stats()
-	updated_stats = update_stats(prev_stats, scraped_data)
-	write_new_stats(updated_stats)
+	return result
 
-
-
-
-def foreign_poker_ids():
-	"""
-	Returns: a list of PokerNow IDs that exist in NET_FILE_NAME but not in 
-	ID_FILE_NAME.
-
-	This function returns a list of strings.
-	"""
-	return different_ids(poker_ids_from_file(NET_FILE_NAME), poker_ids_from_file(ID_FILE_NAME))
 
 
 def different_ids(net_ids, people_ids):
