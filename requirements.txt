@@ -6,3 +6,4 @@ dnspython
 selenium
 requests
 webdriver_manager
+pyvirtualdisplay

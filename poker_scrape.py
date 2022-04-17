@@ -6,6 +6,7 @@ April 9th, 2022
 Scrapes information from pokernow.com.
 """
 
+from pyvirtualdisplay import Display
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -14,12 +15,13 @@ from webdriver_manager.chrome import ChromeDriverManager
 import requests
 import time
 
+display = Display(visible = False, size = (1350, 745))
+display.start()
+
 gChromeOptions = webdriver.ChromeOptions()
-gChromeOptions.add_argument("window-size=1350x745")
 gChromeOptions.add_argument("disable-dev-shm-usage")
 gChromeOptions.add_argument("--disable-dev-shm-usage")
 gChromeOptions.add_argument("--no-sandbox")
-gChromeOptions.add_argument("--headless")
 
 
 def valid_url(url):
@@ -48,6 +50,7 @@ def scrape_ledger_data(url):
 
 	#driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
 	driver = webdriver.Chrome(chrome_options=gChromeOptions, executable_path=ChromeDriverManager().install())
+	driver = webdriver.Chrome(chrome_options=gChromeOptions, executable_path=os.environ.get("CHROMEDRIVER_PATH"))
 	driver.get(url)
 	wait = WebDriverWait(driver, 20)
 	driver.save_screenshot('testie.png')
