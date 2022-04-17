@@ -84,6 +84,7 @@ async def track(ctx, *, url):
 
 	if game.PokerGame.current_game != None:
 		await game.PokerGame.current_game.immortalize()
+		time.sleep(5)
 		game.PokerGame.current_game = None
 
 	player_discord_ids = []
