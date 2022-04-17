@@ -3,3 +3,6 @@ flask
 python-dotenv
 PyNaCl
 dnspython
+selenium
+time
+requests
