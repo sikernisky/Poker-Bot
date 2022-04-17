@@ -50,11 +50,10 @@ def scrape_ledger_data(url):
 	driver = webdriver.Chrome(chrome_options=gChromeOptions, executable_path=ChromeDriverManager().install())
 	driver.get(url)
 	wait = WebDriverWait(driver, 20)
-	time.sleep(5)
+	driver.save_screenshot('testie.png')
 	WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="canvas"]/div[1]/button'))).send_keys(Keys.RETURN)
 	stats_button = driver.find_element(By.XPATH, '//*[@id="canvas"]/div[1]/button')
 	driver.execute_script("arguments[0].click();", stats_button)
-	time.sleep(5)
 	WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH,'//*[@id="canvas"]/div[1]/div[2]/div/div[2]/div[2]/button[2]'))).send_keys(Keys.RETURN)
 	ledger_button = driver.find_element(By.XPATH, 
 		'//*[@id="canvas"]/div[1]/div[2]/div/div[2]/div[2]/button[2]')
