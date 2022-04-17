@@ -6,7 +6,6 @@ April 9th, 2022
 Scrapes information from pokernow.com.
 """
 
-from pyvirtualdisplay import Display
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -14,9 +13,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import requests
 import time
-
-display = Display(visible = False, size = (1350, 745))
-display.start()
 
 gChromeOptions = webdriver.ChromeOptions()
 gChromeOptions.add_argument("disable-dev-shm-usage")
@@ -50,10 +46,9 @@ def scrape_ledger_data(url):
 
 	#driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
 	driver = webdriver.Chrome(chrome_options=gChromeOptions, executable_path=ChromeDriverManager().install())
-	driver = webdriver.Chrome(chrome_options=gChromeOptions, executable_path=os.environ.get("CHROMEDRIVER_PATH"))
 	driver.get(url)
+	print(driver.page_source.encode("utf-8"))
 	wait = WebDriverWait(driver, 20)
-	driver.save_screenshot('testie.png')
 	WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="canvas"]/div[1]/button'))).send_keys(Keys.RETURN)
 	stats_button = driver.find_element(By.XPATH, '//*[@id="canvas"]/div[1]/button')
 	driver.execute_script("arguments[0].click();", stats_button)
