@@ -93,8 +93,6 @@ async def track(ctx, *, url):
 	tracked_game = game.PokerGame(player_discord_ids, url)
 	game.PokerGame.update_ctx = ctx
 
-	await game.PokerGame.current_game.live_nets()
-
 	#If there is a game already being tracked, write the Nets.
 
 
