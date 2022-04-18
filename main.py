@@ -36,6 +36,7 @@ async def test(ctx):
 async def stats(ctx):
 	"""
 	"""
+
 	if game.PokerGame.current_game == None:
 		await game.print_poker_stats(ctx, client, poker_save.stats())
 	elif game.PokerGame.new_ids != []:
@@ -82,8 +83,11 @@ async def track(ctx, *, url):
 	await ctx.send("Tracking URL: **" + url + "**.")
 
 	if game.PokerGame.current_game != None:
-		await game.PokerGame.current_game.immortalize()
-		game.PokerGame.current_game = None
+		#await game.PokerGame.current_game.immortalize()
+		nets = await game.PokerGame.current_game.live_nets()
+		computed = poker_save.compute_stats(nets, poker_save.previous_people())
+		await game.print_poker_stats(ctx, client, computed)
+		#game.PokerGame.current_game = None
 
 	player_discord_ids = []
 	prev_players = poker_save.previous_people()
