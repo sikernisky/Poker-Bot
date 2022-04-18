@@ -52,6 +52,7 @@ async def wipe(ctx, * password):
 	"""
 	Wipes all files. Requires password.
 	"""
+	print(os.getenv('WIPEPASSWORD'))
 	if password == None or password == '':
 		await ctx.send("Please type the password next to !wipe.")
 	elif password == os.getenv('WIPEPASSWORD'):
