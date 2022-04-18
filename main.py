@@ -82,10 +82,9 @@ async def track(ctx, *, url):
 	# 	return
 	await ctx.send("Tracking URL: **" + url + "**.")
 
-	#if game.PokerGame.current_game != None:
-		#await game.PokerGame.current_game.immortalize()
-		#game.PokerGame.current_game = None
-
+	if game.PokerGame.current_game != None:
+		await game.PokerGame.current_game.immortalize()
+	
 	player_discord_ids = []
 	prev_players = poker_save.previous_people()
 	for k in prev_players:
