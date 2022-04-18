@@ -82,7 +82,7 @@ async def track(ctx, *, url):
 	# 	return
 	await ctx.send("Tracking URL: **" + url + "**.")
 
-	if game.PokerGame.current_game != None:
+	#if game.PokerGame.current_game != None:
 		#await game.PokerGame.current_game.immortalize()
 		#game.PokerGame.current_game = None
 
