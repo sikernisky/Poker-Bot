@@ -50,7 +50,6 @@ def scrape_ledger_data(url):
 	#driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
 	driver = webdriver.Chrome(options=gChromeOptions, executable_path=ChromeDriverManager().install())
 	driver.get(url)
-	print(driver.page_source)
 	wait = WebDriverWait(driver, 10)
 	stats_button = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, 'show-log-button')))
 	stats_button = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="canvas"]/div[1]/button')))

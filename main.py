@@ -77,9 +77,9 @@ async def track(ctx, *, url):
 
 	Creates a new Game object and immediately updates all nets and people.
 	"""
-	if not poker_scrape.valid_url(url):
-		await ctx.send("That URL does not link to an active PokerNow game.")
-		return
+	# if not poker_scrape.valid_url(url):
+	# 	await ctx.send("That URL does not link to an active PokerNow game.")
+	# 	return
 	await ctx.send("Tracking URL: **" + url + "**.")
 
 	if game.PokerGame.current_game != None:
