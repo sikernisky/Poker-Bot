@@ -3,7 +3,7 @@ poker_save.py
 Teddy Siker
 April 10th, 2022
 
-A module responsible for saving everyone's Poker stats.
+A module responsible for saving and manipulating data from save files.
 """
 import json
 

@@ -114,9 +114,3 @@ def clean_ledger_data(raw_data):
 		result_dict[player_id] = int(net)
 
 	return result_dict
-
-
-if __name__ == '__main__':
-	url1 = 'https://www.pokernow.club/games/pglfGWYiDhD618K4dly9jFOh_'
-	url2 = 'https://www.pokernow.club/games/pglXIp61_ccv7gtbci9Ph8D0G'
-	print(scrape_ledger_data(url1))

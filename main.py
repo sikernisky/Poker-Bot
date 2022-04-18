@@ -6,7 +6,7 @@ import os
 import discord
 from discord.ext import commands
 import game
-from dotenv import load_dotenv #Delete once on Heroku
+from dotenv import load_dotenv
 from discord.ext import tasks
 
 
@@ -18,23 +18,21 @@ client = commands.Bot(intents = intents, command_prefix='!')
 @client.event
 async def on_ready():
 	"""
-	Performs logic when the bot is 'Ready'.
+	Prints a message to the console to confirm that Poker Bot is ready.
+
+	The message is 'Poker Bot Ready!'
 	"""
 	print('Poker Bot Ready!')
 
-
-@client.command()
-async def test(ctx):
-	"""
-	
-	"""
-	game.PokerGame.new_ids = ['biden', 'manchin']
-	await poll_members(ctx)
 
 
 @client.command()
 async def stats(ctx):
 	"""
+	Scrapes the current PokerNow game to send accumulated net balances along
+	with the live net balances.
+
+	If there is no active PokerNow game, sends accumulated net balances.
 	"""
 
 	if game.PokerGame.current_game == None:
@@ -50,21 +48,17 @@ async def stats(ctx):
 
 
 @client.command()
-async def wipe(ctx):
+async def wipe(ctx, * password):
 	"""
+	Wipes all files. Requires password.
 	"""
-	poker_save.wipe_files()
-	await ctx.send("Wiped files.")
-
-
-# @tasks.loop(seconds=25)
-# async def refresh():
-# 	if game.PokerGame.current_game != None and game.PokerGame.update_ctx != None:
-# 		scraped_data = poker_scrape.scrape_ledger_data(game.PokerGame.current_game.url)
-# 		poker_save.update_all_balances(scraped_data)
-# 		game.PokerGame.new_ids = poker_save.foreign_poker_ids()
-# 		await poll_members(game.PokerGame.update_ctx)
-
+	if password == None or password == '':
+		await ctx.send("Please type the password next to !wipe.")
+	elif password == os.getenv('WIPEPASSWORD'):
+		poker_save.wipe_files()
+		await ctx.send("Wiped files.")
+	else:
+		await ctx.send("Incorrect password.")
 
 
 @client.command()
@@ -72,19 +66,14 @@ async def track(ctx, *, url):
 	"""
 	Tracks a PokerNow URL.
 
-	Parameter url: The PokerNow URL that represents the Game to track.
-	Precondition: url is a string and a valid PokerNow URL.
-
-	Creates a new Game object and immediately updates all nets and people.
+	Creates a new PokerGame object and sets it to be the current game.
 	"""
-	# if not poker_scrape.valid_url(url):
-	# 	await ctx.send("That URL does not link to an active PokerNow game.")
-	# 	return
+
 	await ctx.send("Tracking URL: **" + url + "**.")
 
 	if game.PokerGame.current_game != None:
 		await game.PokerGame.current_game.immortalize()
-	
+
 	player_discord_ids = []
 	prev_players = poker_save.previous_people()
 	for k in prev_players:
@@ -93,22 +82,6 @@ async def track(ctx, *, url):
 	tracked_game = game.PokerGame(player_discord_ids, url)
 	game.PokerGame.update_ctx = ctx
 	game.PokerGame.current_game = tracked_game
-
-	#If there is a game already being tracked, write the Nets.
-
-
-
-# 	# #1. Scrape data.
-# 	# scraped_data = poker_scrape.scrape_ledger_data(url)
-	
-# 	# #2. Update everyone's net balances.
-# 	# poker_save.update_all_balances(scraped_data)
-
-# 	# #3. Get new/foreign PokerNow IDs in the updated NET file.
-# 	# new_ids = poker_save.get_foreign_ids()
-
-# 	# #4. Poll users to match new Poker IDs to Discord IDs.
-# 	# pass
 
 
 @client.command()
@@ -129,20 +102,6 @@ async def assign(ctx, *, member : discord.Member = None):
 	await ctx.send("I assigned the PokerNow ID: **" + game.PokerGame.id_query + "** to " + member.name  + ".")
 	game.PokerGame.id_query = ''
 	await game.PokerGame.current_game.poll_members(ctx)
-
-
-
-		# def check(m):
-		# 	"""
-		# 	Returns: True if m is in the format:
-
-		# 	'!claim [some discord user]'
-		# 	"""
-		# 	keyword = '!assign'
-		# 	return (len(m.content) >= (len(keyword) + 2) and m.content[:len(keyword)] == keyword
-		# 		and m.content[len(keyword)] == ' ')
-		# response = await client.wait_for('message', check = check, timeout=20)
-		# print(response.content)
 
 
 client.run(os.getenv('TOKEN'))

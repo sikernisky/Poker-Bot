@@ -12,15 +12,15 @@ from discord.ext import tasks
 
 class PokerGame(object):
 	"""
-	A class to represent a Poker Game.
+	A class to represent poker games on pokernow.com.
 
-	An instance represents this session's Poker Game.
+	An instance represents a PokerNow game.
 
 	Class Attributes:
 		- current_game [PokerGame] : the current PokerGame
 		- id_query [str] : the current PokerNow ID PokerBot is asking to identify
 		- new_ids [string list] : all PokerNow IDs PokerBot doesn't recognize.
-		- REFRESH_RATE [int] : seconds between refreshing stats.
+		- update_ctx [discord.Context] : valid bot context.
 
 	Instance Attributes:
 		- url [string] : this game's URL
@@ -31,7 +31,6 @@ class PokerGame(object):
 	update_ctx = None
 	id_query = ''
 	new_ids = []
-	REFRESH_RATE = 30
 
 	def __init__(self, players, url):
 		"""
@@ -102,8 +101,6 @@ class PokerGame(object):
 		await ctx.send("New PokerNow ID found: **" + poker_id + "**. Type !assign [person].")
 		PokerGame.id_query = poker_id
 			
-
-
 
 	async def immortalize(self):
 		"""
