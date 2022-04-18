@@ -43,7 +43,6 @@ async def stats(ctx):
 	else:
 		await ctx.send("Please give me a moment while I scrape live PokerNow data. . .")
 		nets = await game.PokerGame.current_game.live_nets()
-		print(type(nets))
 		computed = poker_save.compute_stats(nets, poker_save.previous_people())
 		await game.print_poker_stats(ctx, client, computed)
 
@@ -84,7 +83,6 @@ async def track(ctx, *, url):
 
 	if game.PokerGame.current_game != None:
 		await game.PokerGame.current_game.immortalize()
-		time.sleep(5)
 		game.PokerGame.current_game = None
 
 	player_discord_ids = []
@@ -95,7 +93,7 @@ async def track(ctx, *, url):
 	tracked_game = game.PokerGame(player_discord_ids, url)
 	game.PokerGame.update_ctx = ctx
 
-	await tracked_game.live_nets()
+	await game.PokerGame.current_game.live_nets()
 
 	#If there is a game already being tracked, write the Nets.
 
