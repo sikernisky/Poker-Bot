@@ -34,16 +34,10 @@ async def stats(ctx):
 
 	If there is no active PokerNow game, sends accumulated net balances.
 	"""
-
-	if game.PokerGame.current_game == None:
-		await game.print_poker_stats(ctx, client, poker_save.stats())
-	elif game.PokerGame.new_ids != []:
-		await ctx.send("Please assign players so that my stats are accurate.")
-	else:
-		await ctx.send("Please give me a moment while I scrape live PokerNow data. . .")
-		nets = await game.PokerGame.current_game.live_nets()
-		computed = poker_save.compute_stats(nets, poker_save.previous_people())
-		await game.print_poker_stats(ctx, client, computed)
+	await ctx.send("Please give me a moment while I scrape live PokerNow data. . .")
+	nets = await game.PokerGame.current_game.live_nets()
+	computed = poker_save.compute_stats(nets, poker_save.previous_people())
+	await game.print_poker_stats(ctx, client, computed)
 
 
 
@@ -52,14 +46,8 @@ async def wipe(ctx, * password):
 	"""
 	Wipes all files. Requires password.
 	"""
-	print(os.getenv('WIPEPASSWORD'))
-	if password == None or password == '':
-		await ctx.send("Please type the password next to !wipe.")
-	elif password == os.getenv('WIPEPASSWORD'):
-		poker_save.wipe_files()
-		await ctx.send("Wiped files.")
-	else:
-		await ctx.send("Incorrect password.")
+	poker_save.wipe_files()
+	await ctx.send("Wiped files.")
 
 
 @client.command()
