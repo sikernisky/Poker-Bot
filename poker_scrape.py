@@ -53,10 +53,11 @@ def scrape_ledger_data(url):
 	wait = WebDriverWait(driver, 10)
 	stats_button = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, 'show-log-button')))
 	driver.execute_script("arguments[0].click();", stats_button)
-	ledger_button = wait.until(EC.element_to_be_clickable((By.XPATH,'//*[@id="canvas"]/div[1]/div[2]/div/div[2]/div[2]/button[2]')))
+	ledger_button = wait.until(EC.element_to_be_clickable((By.CLASS_NAME,'ledger-button')))
 	driver.execute_script("arguments[0].click();", ledger_button)
-	elem = wait.until(EC.visibility_of_element_located((By.XPATH, 
-		'/html/body/div[1]/div/div[1]/div[2]/div/div[2]/div[1]/div')))
+	elem = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, 
+		'ledger-rows')))
+
 	return clean_ledger_data(elem.text)
 
 def clean_ledger_data(raw_data):
