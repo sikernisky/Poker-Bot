@@ -11,7 +11,6 @@ import game
 
 NET_FILE_NAME = 'stats.json'
 ID_FILE_NAME = 'people.json'
-client = pymongo.MongoClient('')
 
 
 
