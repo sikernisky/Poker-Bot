@@ -72,7 +72,7 @@ async def track(ctx, *, url):
 		player_discord_ids.append(prev_players[k])
 
 	tracked_game = game.PokerGame(player_discord_ids, url)
-	tracked_game.db(cluster str(ctx.message.guild.id))
+	tracked_game.db(cluster, str(ctx.message.guild.id))
 	game.PokerGame.update_ctx = ctx
 	game.PokerGame.current_game = tracked_game
 
