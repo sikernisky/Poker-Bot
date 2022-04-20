@@ -8,11 +8,13 @@ from discord.ext import commands
 import game
 from dotenv import load_dotenv
 from discord.ext import tasks
+import pymongo
 
 
 intents = discord.Intents.default()
 intents.members = True
 client = commands.Bot(intents = intents, command_prefix='!')
+cluster = pymongo.MongoClient(os.getenv('MONGO'))
 
 
 @client.event
@@ -23,6 +25,7 @@ async def on_ready():
 	The message is 'Poker Bot Ready!'
 	"""
 	print('Poker Bot Ready!')
+
 
 
 
@@ -69,6 +72,7 @@ async def track(ctx, *, url):
 		player_discord_ids.append(prev_players[k])
 
 	tracked_game = game.PokerGame(player_discord_ids, url)
+	#tracked_game.db()
 	game.PokerGame.update_ctx = ctx
 	game.PokerGame.current_game = tracked_game
 

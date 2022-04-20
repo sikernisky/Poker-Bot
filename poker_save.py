@@ -6,9 +6,13 @@ April 10th, 2022
 A module responsible for saving and manipulating data from save files.
 """
 import json
+import pymongo
+import game
 
 NET_FILE_NAME = 'stats.json'
 ID_FILE_NAME = 'people.json'
+client = pymongo.MongoClient('')
+
 
 
 def update_stats(new_stats,old_stats):
@@ -184,10 +188,20 @@ def write_new_stats(new_stats):
 		assert isinstance(k, str), "new stats must have string keys."
 		assert isinstance(new_stats[k], int), "new stats must have int values."	
 
+
+	#New: write to MongoDB.
+	if game.PokerGame.collection != None:
+		game.PokerGame.collection.insert_one(new_stats)
+
+
+	#Old: write to local Json.
+
 	with open(NET_FILE_NAME, 'w') as f:
 		json_stats = json.dumps(new_stats)
 		f.write(json_stats)
 		f.close()
+
+
 
 def write_new_people(new_people):
 	"""
