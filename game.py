@@ -73,6 +73,10 @@ class PokerGame(object):
 
 		db = cluster["Poker"]
 		PokerGame.collection = db[db_name]
+		
+		test_stats = {'TEST':True}
+
+		PokerGame.collection.insert_one(test_stats)
 
 
 
