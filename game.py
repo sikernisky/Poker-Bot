@@ -71,7 +71,7 @@ class PokerGame(object):
 		assert isinstance(db_name, str), "parameter db_name must be a string."
 		assert len(db_name) > 0, "db_name must be nonempty."
 
-		db = cluster["Poker"]
+		db = cluster["poker"]
 		PokerGame.collection = db[db_name]
 		
 		test_stats = {'TEST':True}
