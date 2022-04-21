@@ -74,6 +74,7 @@ async def track(ctx, *, url):
 	prev_players = poker_save.previous_people()
 	for k in prev_players:
 		player_discord_ids.append(prev_players[k])
+		print(type(prev_players[k]))
 
 	tracked_game = game.PokerGame(player_discord_ids, url)
 	game.PokerGame.update_ctx = ctx
