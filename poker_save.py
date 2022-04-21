@@ -51,6 +51,7 @@ def add_player(poker_id, discord_id):
 	Adds a {PokerID : DiscordID} key:value pair to ID_FILE_NAME.
 	"""
 	prev_people = previous_people()
+	print('ADD NEW PLAYER GETS: ' + str(prev_people))
 	prev_people[poker_id] = discord_id
 	write_new_people(prev_people)
 
@@ -70,7 +71,6 @@ def previous_stats():
 			if item != '_id:':
 				result[item] = doc[item]
 
-	print(result)
 
 	return result
 
@@ -169,6 +169,8 @@ def previous_people():
 		for item in doc:
 			if isinstance(item, str):
 				result[item] = doc[item]
+
+	print('PREVIOUS PEOPLE RETURNS: ' + str(result))
 
 	return result
 
