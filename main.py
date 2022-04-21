@@ -66,6 +66,10 @@ async def track(ctx, *, url):
 	if game.PokerGame.current_game != None:
 		await game.PokerGame.current_game.immortalize()
 
+	db = cluster[str(ctx.message.guild.id)]
+	PokerGame.stats_collection = db['stats']
+	PokerGame.people_collection = db['people']
+
 	player_discord_ids = []
 	prev_players = poker_save.previous_people()
 	for k in prev_players:
@@ -74,7 +78,6 @@ async def track(ctx, *, url):
 	tracked_game = game.PokerGame(player_discord_ids, url)
 	game.PokerGame.update_ctx = ctx
 	game.PokerGame.current_game = tracked_game
-	tracked_game.db(cluster, str(ctx.message.guild.id))
 
 
 

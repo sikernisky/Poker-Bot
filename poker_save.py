@@ -162,6 +162,9 @@ def previous_people():
 	"""
 
 	#Get from MongoDB.
+	db = cluster[db_name]
+	PokerGame.stats_collection = db['stats']
+	PokerGame.people_collection = db['people']
 	people_documents = game.PokerGame.people_collection.find({})
 	result = {}
 	for doc in people_documents:

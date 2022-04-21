@@ -58,24 +58,24 @@ class PokerGame(object):
 
 		PokerGame.current_game = self
 
-	def db(self, cluster, db_name):
-		"""
-		Returns: the current MongoDB Database object.
+	# def db(self, cluster, db_name):
+	# 	"""
+	# 	Returns: the current MongoDB Database object.
 
-		Parameter db_name: The name of the database to get.
-		Precondition: db_name is a nonempty string.
+	# 	Parameter db_name: The name of the database to get.
+	# 	Precondition: db_name is a nonempty string.
 
-		Parameter cluster: The MongoDB cluster where PokerBot saves stats.
-		Precondition: cluster is a valid cluster object.
+	# 	Parameter cluster: The MongoDB cluster where PokerBot saves stats.
+	# 	Precondition: cluster is a valid cluster object.
 
-		If one doesn't exist, creates a new one.
-		"""
-		assert isinstance(db_name, str), "parameter db_name must be a string."
-		assert len(db_name) > 0, "db_name must be nonempty."
+	# 	If one doesn't exist, creates a new one.
+	# 	"""
+	# 	assert isinstance(db_name, str), "parameter db_name must be a string."
+	# 	assert len(db_name) > 0, "db_name must be nonempty."
 
-		db = cluster[db_name]
-		PokerGame.stats_collection = db['stats']
-		PokerGame.people_collection = db['people']
+	# 	db = cluster[db_name]
+	# 	PokerGame.stats_collection = db['stats']
+	# 	PokerGame.people_collection = db['people']
 
 
 	async def live_nets(self):
