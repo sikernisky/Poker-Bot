@@ -167,7 +167,7 @@ def previous_people():
 	result = {}
 	for doc in people_documents:
 		for item in doc:
-			if isinstance(item, str):
+			if item != '_id':
 				result[item] = doc[item]
 
 	print('PREVIOUS PEOPLE RETURNS: ' + str(result))
