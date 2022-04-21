@@ -67,8 +67,8 @@ async def track(ctx, *, url):
 		await game.PokerGame.current_game.immortalize()
 
 	db = cluster[str(ctx.message.guild.id)]
-	PokerGame.stats_collection = db['stats']
-	PokerGame.people_collection = db['people']
+	game.PokerGame.stats_collection = db['stats']
+	game.PokerGame.people_collection = db['people']
 
 	player_discord_ids = []
 	prev_players = poker_save.previous_people()
