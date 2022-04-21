@@ -70,6 +70,8 @@ def previous_stats():
 			if item != '_id:':
 				result[item] = doc[item]
 
+	print(result)
+
 	return result
 
 def wipe_files():
@@ -206,16 +208,8 @@ def write_new_stats(new_stats):
 
 
 	#write to MongoDB.
-	if game.PokerGame.collection != None:
-		game.PokerGame.collection.insert_one(new_stats)
-
-
-	#Write to local Json.
-	with open(NET_FILE_NAME, 'w') as f:
-		json_stats = json.dumps(new_stats)
-		f.write(json_stats)
-		f.close()
-
+	if game.PokerGame.stats_collection != None:
+		game.PokerGame.stats_collection.insert_one(new_stats)
 
 
 def write_new_people(new_people):
@@ -232,10 +226,8 @@ def write_new_people(new_people):
 		assert isinstance(k, str), "new stats must have string keys."
 		assert isinstance(new_people[k], str), "new stats must have string values."	
 
-	with open(ID_FILE_NAME, 'w') as f:
-		json_stats = json.dumps(new_people)
-		f.write(json_stats)
-		f.close()
+	if game.PokerGame.people_collection != None:
+		game.PokerGame.people_collection.insert_one(new_people)
 
 
 def file_exists(file):
