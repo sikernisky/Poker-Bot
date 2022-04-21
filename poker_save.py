@@ -67,28 +67,12 @@ def previous_stats():
 	result = {}
 	for doc in stats_documents:
 		for item in doc:
-			if item != '_id:':
+			if item != '_id':
 				print(item)
 				result[item] = doc[item]
 
 
 	return result
-
-def wipe_files():
-	"""
-	Wipes all data in NET_FILE_NAME and ID_FILE_NAME.
-	"""
-
-	with open(NET_FILE_NAME, 'w') as f:
-		json_stats = json.dumps({})
-		f.write(json_stats)
-		f.close()
-
-	with open(ID_FILE_NAME, 'w') as f:
-		json_stats = json.dumps({})
-		f.write(json_stats)
-		f.close()
-
 
 def stats():
 	"""

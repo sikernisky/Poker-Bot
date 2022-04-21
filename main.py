@@ -49,7 +49,14 @@ async def wipe(ctx, * password):
 	"""
 	Wipes all files. Requires password.
 	"""
-	poker_save.wipe_files()
+	db = cluster[str(ctx.message.guild.id)]
+	stats_collection = db['stats']
+	people_collection = db['people']
+	stats_collection.drop()
+	people_collection.drop()
+	game.PokerGame.stats_collection = db['stats']
+	game.PokerGame.people_collection = db['people']
+	
 	await ctx.send("Wiped files.")
 
 
