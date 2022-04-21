@@ -52,6 +52,7 @@ def add_player(poker_id, discord_id):
 	"""
 	prev_people = previous_people()
 	prev_people[poker_id] = discord_id
+	print(prev_people)
 	write_new_people(prev_people)
 
 
