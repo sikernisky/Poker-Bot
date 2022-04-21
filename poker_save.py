@@ -13,7 +13,6 @@ NET_FILE_NAME = 'stats.json'
 ID_FILE_NAME = 'people.json'
 
 
-
 def update_stats(new_stats,old_stats):
 	"""
 	Returns: a dictionary of PokerNow PlayerIDs and updated net balances.
@@ -64,9 +63,14 @@ def previous_stats():
 		-key [string]: valid PokerNow ID
 		-value [int]: accumulated, saved net balance
 	"""
-	with open(NET_FILE_NAME, 'r') as f:
-		data = json.load(f)
-		return data
+	stats_documents = game.PokerGame.stats_collection.find({})
+	result = {}
+	for doc in stats_documents:
+		for item in doc:
+			if item != '_id:':
+				result[item] = doc[item]
+
+	return result
 
 def wipe_files():
 	"""
@@ -154,9 +158,22 @@ def previous_people():
 		-key [string]: valid PokerNow ID
 		-value [string]: valid Discord ID	
 	"""
-	with open(ID_FILE_NAME, 'r') as f:
-		data = json.load(f)
-		return data
+
+	#Get from MongoDB.
+	people_documents = game.PokerGame.people_collection.find({})
+	result = {}
+	for doc in people_documents:
+		for item in doc:
+			if item != '_id:':
+				result[item] = doc[item]
+
+	return result
+
+
+	#Get from local Json.
+	# with open(ID_FILE_NAME, 'r') as f:
+	# 	data = json.load(f)
+	# 	return data
 
 def poker_ids_from_file(file):
 	"""
@@ -188,13 +205,12 @@ def write_new_stats(new_stats):
 		assert isinstance(new_stats[k], int), "new stats must have int values."	
 
 
-	#New: write to MongoDB.
+	#write to MongoDB.
 	if game.PokerGame.collection != None:
 		game.PokerGame.collection.insert_one(new_stats)
 
 
-	#Old: write to local Json.
-
+	#Write to local Json.
 	with open(NET_FILE_NAME, 'w') as f:
 		json_stats = json.dumps(new_stats)
 		f.write(json_stats)

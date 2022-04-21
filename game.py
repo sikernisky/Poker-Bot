@@ -21,7 +21,8 @@ class PokerGame(object):
 		- id_query [str] : the current PokerNow ID PokerBot is asking to identify
 		- new_ids [string list] : all PokerNow IDs PokerBot doesn't recognize.
 		- update_ctx [discord.Context] : valid bot context.
-		- collection [MongoDB database] : the Mongo database to save to.
+		- stats_collection [MongoDB database] : the Mongo STATS database to save to.
+		- people_collection [MongoDB database] : the Mongo PEOPLE database to save to.
 
 	Instance Attributes:
 		- url [string] : this game's URL
@@ -32,7 +33,8 @@ class PokerGame(object):
 	update_ctx = None
 	id_query = ''
 	new_ids = []
-	collection = None
+	stats_collection = None
+	people_collection = None
 
 
 	def __init__(self, players, url):
@@ -71,13 +73,9 @@ class PokerGame(object):
 		assert isinstance(db_name, str), "parameter db_name must be a string."
 		assert len(db_name) > 0, "db_name must be nonempty."
 
-		db = cluster["poker"]
-		PokerGame.collection = db[db_name]
-		
-		test_stats = {'TEST':True}
-
-		PokerGame.collection.insert_one(test_stats)
-
+		db = cluster[db_name]
+		PokerGame.stats_collection = db['stats']
+		PokerGame.people_collection = db['people']
 
 
 	async def live_nets(self):
