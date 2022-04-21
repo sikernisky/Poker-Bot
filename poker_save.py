@@ -52,7 +52,6 @@ def add_player(poker_id, discord_id):
 	"""
 	prev_people = previous_people()
 	prev_people[poker_id] = discord_id
-	print(prev_people)
 	write_new_people(prev_people)
 
 
@@ -168,7 +167,7 @@ def previous_people():
 	result = {}
 	for doc in people_documents:
 		for item in doc:
-			if item != '_id:':
+			if isinstance(item, str):
 				result[item] = doc[item]
 
 	return result
