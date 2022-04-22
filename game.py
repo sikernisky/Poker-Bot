@@ -105,11 +105,11 @@ class PokerGame(object):
 		For every PokerNow ID in PokerGame.`new_ids`, polls for a Discord ID.
 
 		For example, if new_ids = ['a','b','c'], then PokerBot asks:
-			"New PokerNow ID found: who is 'a'? Type !assign [discord_name] if it's you."
+			"New PokerNow ID found: 'a'. Type !assign [discord_name] if it's you."
 			...
-			"New PokerNow ID found: who is 'b'? Type !assign [discord_name] if it's you."
+			"New PokerNow ID found: 'b'. Type !assign [discord_name] if it's you."
 			...
-			"New PokerNow ID found: who is 'c'? Type !assign [discord_name] if it's you."
+			"New PokerNow ID found: 'c'. Type !assign [discord_name] if it's you."
 
 		A !assign is only valid if the [discord_name.id] matches the [author.id].
 		"""

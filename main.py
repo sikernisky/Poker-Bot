@@ -39,16 +39,20 @@ async def stats(ctx):
 	"""
 	await ctx.send("Please give me a moment while I scrape live PokerNow data. . .")
 	nets = await game.PokerGame.current_game.live_nets()
-	computed = poker_save.compute_stats(nets, poker_save.previous_people())
-	await game.print_poker_stats(ctx, client, computed)
+	if nets is None:
+		return
+	else:
+		computed = poker_save.compute_stats(nets, poker_save.previous_people())
+		await game.print_poker_stats(ctx, client, computed)
 
 
 
 @client.command()
 async def wipe(ctx, * password):
 	"""
-	Wipes all files. Requires password.
+	Wipes all data on this server.
 	"""
+	return #Not allowing wipes right now.
 	db = cluster[str(ctx.message.guild.id)]
 	stats_collection = db['stats']
 	people_collection = db['people']
@@ -56,7 +60,7 @@ async def wipe(ctx, * password):
 	people_collection.drop()
 	game.PokerGame.stats_collection = db['stats']
 	game.PokerGame.people_collection = db['people']
-	
+
 	await ctx.send("Wiped files.")
 
 
