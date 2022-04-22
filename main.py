@@ -25,7 +25,9 @@ async def on_ready():
 	The message is 'Poker Bot Ready!'
 	"""
 	print('Poker Bot Ready!')
-
+	db = cluster[str(ctx.message.guild.id)]
+	game.PokerGame.stats_collection = db['stats']
+	game.PokerGame.people_collection = db['people']
 
 
 
@@ -52,14 +54,12 @@ async def wipe(ctx, * password):
 	"""
 	Wipes all data on this server.
 	"""
-	return #Not allowing wipes right now.
-	db = cluster[str(ctx.message.guild.id)]
+	#return #Not allowing wipes right now.
 	stats_collection = db['stats']
 	people_collection = db['people']
 	stats_collection.drop()
 	people_collection.drop()
-	game.PokerGame.stats_collection = db['stats']
-	game.PokerGame.people_collection = db['people']
+
 
 	await ctx.send("Wiped files.")
 
