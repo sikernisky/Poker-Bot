@@ -26,10 +26,7 @@ async def on_ready():
 	The message is 'Poker Bot Ready!'
 	"""
 	print('Poker Bot Ready!')
-	game.PokerGame.stats_collection = db['stats']
-	game.PokerGame.people_collection = db['people']
 	game.PokerGame.cluster = cluster
-	
 
 
 
