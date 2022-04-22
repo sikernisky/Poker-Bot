@@ -35,6 +35,7 @@ class PokerGame(object):
 	new_ids = []
 	stats_collection = None
 	people_collection = None
+	cluster = None
 
 
 	def __init__(self, players, url):

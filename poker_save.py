@@ -63,7 +63,9 @@ def previous_stats():
 		-key [string]: valid PokerNow ID
 		-value [int]: accumulated, saved net balance
 	"""
-	stats_documents = game.PokerGame.stats_collection.find({})
+	db = game.PokerGame.cluster[str(game.PokerGame.update_ctx.message.guild.id)]
+	col = db['stats']
+	stats_documents = col.find({})
 	result = {}
 	for doc in stats_documents:
 		for item in doc:
@@ -147,7 +149,10 @@ def previous_people():
 
 	#Get from MongoDB.
 
-	people_documents = game.PokerGame.people_collection.find({})
+	db = game.PokerGame.cluster[str(game.PokerGame.update_ctx.message.guild.id)]
+	col = db['people']
+	people_documents = col.find({})
+
 	result = {}
 	for doc in people_documents:
 		for item in doc:

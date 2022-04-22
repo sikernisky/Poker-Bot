@@ -28,6 +28,8 @@ async def on_ready():
 	print('Poker Bot Ready!')
 	game.PokerGame.stats_collection = db['stats']
 	game.PokerGame.people_collection = db['people']
+	game.PokerGame.cluster = cluster
+	
 
 
 
@@ -40,7 +42,7 @@ async def stats(ctx):
 	If there is no active PokerNow game, sends accumulated net balances.
 	"""
 	await ctx.send("Please give me a moment while I scrape live PokerNow data. . .")
-	nets = await game.PokerGame.current_game.live_nets()
+	nets = await game.PokerGame.current_game.live_nets(str(ctx.message.guild.id))
 	if nets is None:
 		return
 	else:
@@ -77,7 +79,7 @@ async def track(ctx, *, url):
 
 	if game.PokerGame.current_game != None:
 		await game.PokerGame.current_game.immortalize()
-		
+
 	db = cluster[str(ctx.message.guild.id)]
 	game.PokerGame.stats_collection = db['stats']
 	game.PokerGame.people_collection = db['people']
