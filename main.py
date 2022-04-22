@@ -15,6 +15,8 @@ intents = discord.Intents.default()
 intents.members = True
 client = commands.Bot(intents = intents, command_prefix='!')
 cluster = pymongo.MongoClient(os.getenv('MONGO'))
+db = cluster[str(ctx.message.guild.id)]
+
 
 
 @client.event
@@ -25,7 +27,6 @@ async def on_ready():
 	The message is 'Poker Bot Ready!'
 	"""
 	print('Poker Bot Ready!')
-	db = cluster[str(ctx.message.guild.id)]
 	game.PokerGame.stats_collection = db['stats']
 	game.PokerGame.people_collection = db['people']
 
@@ -77,7 +78,6 @@ async def track(ctx, *, url):
 	if game.PokerGame.current_game != None:
 		await game.PokerGame.current_game.immortalize()
 
-	db = cluster[str(ctx.message.guild.id)]
 	game.PokerGame.stats_collection = db['stats']
 	game.PokerGame.people_collection = db['people']
 
