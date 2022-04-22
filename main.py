@@ -39,7 +39,7 @@ async def stats(ctx):
 	If there is no active PokerNow game, sends accumulated net balances.
 	"""
 	await ctx.send("Please give me a moment while I scrape live PokerNow data. . .")
-	nets = await game.PokerGame.current_game.live_nets(str(ctx.message.guild.id))
+	nets = await game.PokerGame.current_game.live_nets()
 	if nets is None:
 		return
 	else:
