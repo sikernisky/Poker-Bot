@@ -39,6 +39,7 @@ async def stats(ctx):
 	If there is no active PokerNow game, sends accumulated net balances.
 	"""
 	await ctx.send("Please give me a moment while I scrape live PokerNow data. . .")
+	game.PokerGame.update_ctx = ctx
 	nets = await game.PokerGame.current_game.live_nets()
 	if nets is None:
 		return
@@ -54,6 +55,7 @@ async def wipe(ctx, * password):
 	Wipes all data on this server.
 	"""
 	#return #Not allowing wipes right now.
+	game.PokerGame.update_ctx = ctx
 	db = cluster[str(ctx.message.guild.id)]
 	stats_collection = db['stats']
 	people_collection = db['people']
@@ -99,7 +101,7 @@ async def assign(ctx, *, member : discord.Member = None):
 	"""
 	Assigns `id_query` to `member`. 
 	"""
-
+	game.PokerGame.update_ctx = ctx
 	if game.PokerGame.id_query == '': #Someone types !assign but PokerBot isn't polling
 		await ctx.send("I am not currently matching PokerNow IDs with Discord members.")
 		return
