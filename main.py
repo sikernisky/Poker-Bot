@@ -15,7 +15,6 @@ intents = discord.Intents.default()
 intents.members = True
 client = commands.Bot(intents = intents, command_prefix='!')
 cluster = pymongo.MongoClient(os.getenv('MONGO'))
-db = cluster[str(ctx.message.guild.id)]
 
 
 
@@ -56,6 +55,7 @@ async def wipe(ctx, * password):
 	Wipes all data on this server.
 	"""
 	#return #Not allowing wipes right now.
+	db = cluster[str(ctx.message.guild.id)]
 	stats_collection = db['stats']
 	people_collection = db['people']
 	stats_collection.drop()
@@ -77,7 +77,8 @@ async def track(ctx, *, url):
 
 	if game.PokerGame.current_game != None:
 		await game.PokerGame.current_game.immortalize()
-
+		
+	db = cluster[str(ctx.message.guild.id)]
 	game.PokerGame.stats_collection = db['stats']
 	game.PokerGame.people_collection = db['people']
 
