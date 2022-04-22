@@ -198,8 +198,9 @@ def write_new_stats(new_stats):
 
 
 	#write to MongoDB.
-	if game.PokerGame.stats_collection != None:
-		game.PokerGame.stats_collection.insert_one(new_stats)
+	db = game.PokerGame.cluster[str(game.PokerGame.update_ctx.message.guild.id)]
+	col = db['stats']
+	col.insert_one(new_stats)
 
 
 def write_new_people(new_people):
@@ -216,8 +217,9 @@ def write_new_people(new_people):
 		assert isinstance(k, str), "new stats must have string keys."
 		assert isinstance(new_people[k], str), "new stats must have string values."	
 
-	if game.PokerGame.people_collection != None:
-		game.PokerGame.people_collection.insert_one(new_people)
+	db = game.PokerGame.cluster[str(game.PokerGame.update_ctx.message.guild.id)]
+	col = db['people']
+	col.insert_one(new_people)
 
 
 def file_exists(file):

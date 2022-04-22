@@ -33,8 +33,6 @@ class PokerGame(object):
 	update_ctx = None
 	id_query = ''
 	new_ids = []
-	stats_collection = None
-	people_collection = None
 	cluster = None
 
 
