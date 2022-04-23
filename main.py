@@ -29,6 +29,17 @@ async def on_ready():
 	game.PokerGame.cluster = cluster
 
 
+@client.command()
+async def save(ctx):
+	"""
+	"""
+	try:
+		await game.PokerGame.current_game.immortalize()
+	except:
+		await ctx.send("No current poker game.")
+
+
+
 
 @client.command()
 async def stats(ctx):
